@@ -18,11 +18,9 @@
     "gulp-sass": "^0.7.1",
     "gulp-watch": "^0.6.4"
   },
-  {
   "engines": {
-      "node": "0.10.x",
-      "npm": "1.4.x"
-    }
+    "node": "0.10.x",
+    "npm": "1.4.x"
   },
   "repository": {
     "type": "git",
