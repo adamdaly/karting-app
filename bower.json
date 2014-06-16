@@ -1,0 +1,24 @@
+{
+  "name": "karting-app",
+  "version": "0.0.0",
+  "homepage": "http://karting-app.herokuapp.com/",
+  "authors": [
+    "Adam Daly <a@adamdaly.net>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/js/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "vue": "~0.10.5",
+    "jquery": "~2.1.1",
+    "modernizer": "~2.8.2",
+    "requirejs": "~2.1.14"
+  }
+}
