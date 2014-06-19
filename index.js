@@ -34,14 +34,14 @@ nunjucks.configure('private/views', {
 //Y6ZuGg66
 var database = {
 	url: 'mongodb://adamdaly:Y6ZuGg66@ds053597.mongolab.com:53597/karting-app'
-}
+};
 
 
 app.route('/create-event')
 .get(function(req, res){
 
     res.render('base.html', { title: 'Karting App - Create', template: 'partials/view-event-create.html' });
-})
+});
 // .post(function(req, res){
 // 	// TODO: handle creation of event
 // }
