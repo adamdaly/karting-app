@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{{ title }}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script src="js/libs/modernizer/modernizr.js"></script>
+    </head>
+    <body id="view-root">
+
+        {% block content %}
+        {% endblock %}
+
+        {% include template %}
+
+        <script>
+            var script = document.createElement('script'),
+                body = document.getElementsByTagName('body')[0];
+            
+            script.src = 'js/libs/requirejs/require.js';
+
+            if(document.location.search.match(/debug/gi)){
+                script.setAttribute('data-main', 'js/config');
+
+            }else{
+                script.setAttribute('data-main', 'js/build/app');
+            }
+            
+            body.appendChild(script);
+
+        </script>
+    </body>
+</html>
