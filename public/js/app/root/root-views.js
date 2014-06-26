@@ -14,7 +14,7 @@ define(['dispatcher'], function(dispatcher){
         _previousSubView: null,
         // Simple set view
         _setSubView: function(view){
-        	console.log(view);
+            
         	this.model.set('subView', view);
         },
         // TODO: Create transition between views

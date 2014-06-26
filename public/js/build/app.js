@@ -13995,6 +13995,42 @@ root: root
 })();
 })();
 
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["view-user-create.html"] = (function() {function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+output += "<section id=\"view-user-login\">\n\t<form action=\"/login\" method=\"POST\">\n\t\t<div>\n\t\t\t<label for=\"name\">Username</label>\n\t\t\t<input type=\"text\" name=\"user-name\" id=\"user-create-username\">\n\t\t</div>\n\t\t<div>\n\t\t\t<label for=\"number\">Password</label>\n\t\t\t<input type=\"text\" name=\"user-password\" id=\"user-create-password\">\n\t\t</div>\t\n\t\t<div>\n\t\t\t<input type=\"submit\">\n\t\t</div>\n\t</form>\n</section>";
+cb(null, output);
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+})();
+})();
+
+(function() {(window.nunjucksPrecompiled = window.nunjucksPrecompiled || {})["view-user-login.html"] = (function() {function root(env, context, frame, runtime, cb) {
+var lineno = null;
+var colno = null;
+var output = "";
+try {
+output += "<section id=\"view-user-login\">\n\t<form action=\"/login\" method=\"POST\">\n\t\t<div>\n\t\t\t<label for=\"name\">Username</label>\n\t\t\t<input type=\"text\" name=\"user-name\" id=\"user-name\">\n\t\t</div>\n\t\t<div>\n\t\t\t<label for=\"number\">Password</label>\n\t\t\t<input type=\"text\" name=\"user-password\" id=\"user-password\">\n\t\t</div>\n\t\t<div>\n\t\t\t<label for=\"user-remember\">Remember me</label>\n\t\t\t<input type=\"checkbox\" name=\"user-remember\" id=\"user-remember\">\t\t\n\t\t</div>\n\t\t<div>\n\t\t\t<input type=\"submit\">\n\t\t</div>\n\t</form>\n\t<a href=\"/create-user\" id=\"user-create\">Create User</a>\n</section>";
+cb(null, output);
+;
+} catch (e) {
+  cb(runtime.handleError(e, lineno, colno));
+}
+}
+return {
+root: root
+};
+})();
+})();
+
 define("templates", ["nunjucks"], function(){});
 
 define('dispatcher', ['backbone'],  function(Backbone){
@@ -14011,26 +14047,22 @@ define('router', ['backbone', 'dispatcher'],  function(Backbone, dispatcher){
 
 		},
 		routes: {
-			'create-event': 'createEvent',
-			'': 'index'
-		},
-		index: function(){
-			dispatcher.trigger('view-change', 'view-index');
-		},
-		createEvent: function(){
-			dispatcher.trigger('view-change', 'view-event-create');
+			'create-event': 'view-event-create',
+			'create-user': 'view-user-create',
+			'': 'view-user-login',
+			// '': 'view-index'
 		}
 	});
 
 
     window.router = new Router();
 
+	router.on('route', function(route, params) {
+		dispatcher.trigger('view-change', route);
+	    console.log('Navigation: ' + route);
+	});
 
-	// router.on('route:create-event', function(actions){
-	// 	console('create-event', actions);
-	// });
-
-    Backbone.history.start({pushState: true, silent: true});
+    Backbone.history.start({ pushState: true, silent: true });
 
 	return Router;
 });
@@ -14064,7 +14096,7 @@ define('root-views',['dispatcher'], function(dispatcher){
         _previousSubView: null,
         // Simple set view
         _setSubView: function(view){
-        	console.log(view);
+            
         	this.model.set('subView', view);
         },
         // TODO: Create transition between views
@@ -14072,7 +14104,7 @@ define('root-views',['dispatcher'], function(dispatcher){
 
             if(this.model.get('subView') !== this.model.get('previousSubView')){
                 this.model.set('previousSubView', this.model.get('subView'));
-                this.model.set('subView', app.subViews[view]);
+                this.model.set('subView', app.utils.returnSelectedView(view));
 
                 this.model.get('subView').render().$el.insertBefore(this.model.get('previousSubView').$el);
                 this.model.get('previousSubView').remove();
@@ -14104,8 +14136,18 @@ define('root', ['root-models', 'root-views', 'root-collections'],  function(m, v
 
     return root;
 });
-define('index-models',[],function(){
+define('user-login-models',[],function(){
     var models = {};
+
+    models.formData = Backbone.Model.extend({
+    	defaults: {
+    		userName: '',
+    		userPassword: '',
+    		userRemember: false
+    	},
+    	initialise: function(){
+    	}
+    });
 
     return models;
 });
@@ -14116,12 +14158,300 @@ define('base-view', ['nunjucks'], function(nunjucks){
 		render: function(){
 			return this;
 		},
-		add: function(){},
-		remove: function(){
+        _initializeSubViews: function(){},
+		_add: function(){},
+		_remove: function(){
 			this.el.remove();
 		}
 	});
 	return BaseView;
+});
+define('user-login-views',['base-view', 'nunjucks', 'dispatcher'], function(BaseView, nunjucks, dispatcher){
+
+    var views = {};
+
+    views.userLogin = BaseView.extend({
+        name: 'login',
+
+        el: '#view-user-login',
+        id: 'view-user-login',
+
+        events: {
+            'click input[type="submit"]': 'onSubmit',
+            'click #user-create': 'onUserCreate'
+        },
+
+        // template: nunjucks.render('create-event.html'),
+
+        initialize: function(){
+            
+            this.listenTo(this.model, 'change', this._update);
+        },
+
+        render: function(){
+            var template = nunjucks.render('view-user-login.html', {});
+            
+            this.setElement(template);
+
+            return this;
+        },
+
+        onSubmit: function(e){
+            e.preventDefault();
+            var self = this;
+
+            $.ajax({
+                url: '/login',
+                method: 'POST',
+                dataType: 'JSON',
+                data: self.model.toJSON(),
+                success: self._submitSuccess,
+                error: self._submitError
+            });
+        },
+
+        _submitSuccess: function(res){
+            console.log(res);
+            // Moved to server-side
+            // if(!!res.hasOwnProperty('success')){
+            //     document.cookie = 'username=' + res.data.username;
+            //     document.cookie = 'password=' +  res.data.password;
+            //     document.cookie = 'token=' + res.data.token;
+            // }
+            
+        },
+
+        _submitError: function(error){
+            console.log(error);
+        },
+
+        onUserCreate: function(e){
+            e.preventDefault();
+            router.navigate('/create-user', { trigger: true });
+
+            // dispatcher.trigger('view-change', 'view-user-create');
+        }
+    });
+
+    views.username = Backbone.View.extend({
+        name: 'username',
+
+        el: '#user-name',
+        id: 'user-name',
+
+        events: {
+            'keyup': 'onChange',
+            'select': 'onChange'// Because of autofill
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('userName', this.el.value);
+        }
+    });
+
+    views.password = Backbone.View.extend({
+        name: 'password',
+
+        el: '#user-password',
+        id: 'user-password',
+
+        events: {
+            'keyup': 'onChange',
+            'select': 'onChange'// Because of autofill
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('userPassword', this.el.value);
+        }
+    });
+
+    return views;
+});
+define('user-login-collections',[],function(){
+    var collections = {};
+
+    return collections;
+});
+define('user-login', ['user-login-models', 'user-login-views', 'user-login-collections'],  function(m, v, c){
+    var userLogin = {
+        models: m,
+        views: v,
+        collections: c
+    };
+
+
+    var formData = new userLogin.models.formData();
+
+    userLogin.viewUserLogin = new userLogin.views.userLogin({
+        model: formData
+    });
+
+    userLogin.username = new userLogin.views.username({
+        model: formData
+    });
+
+    userLogin.password = new userLogin.views.password({
+        model: formData
+    });
+
+    return userLogin;
+});
+define('user-create-models',[],function(){
+    var models = {};
+
+    models.formData = Backbone.Model.extend({
+    	defaults: {
+    		userName: '',
+    		userPassword: ''
+    	},
+    	initialise: function(){
+    	}
+    });
+
+    return models;
+});
+define('user-create-views',['base-view', 'nunjucks'], function(BaseView, nunjucks){
+
+    var views = {};
+
+    views.userCreate = BaseView.extend({
+        name: 'user-create',
+
+        id: 'view-user-create',
+
+        events: {
+            'click input[type="submit"]': 'onSubmit'
+        },
+
+        // template: nunjucks.render('create-event.html'),
+
+        initialize: function(){
+            
+            this.listenTo(this.model, 'change', this._update);
+        },
+
+        render: function(){
+            var template = nunjucks.render('view-user-create.html', {});
+            
+            this.setElement(template);
+
+            //doesn't exist yet?
+            this._initializeSubViews();
+
+            return this;
+        },
+
+        onSubmit: function(e){
+            e.preventDefault();
+            var self = this;
+
+            $.ajax({
+                url: '/create-user',
+                method: 'POST',
+                dataType: 'JSON',
+                data: this.model.toJSON(),
+                success: self._submitSuccess,
+                error: self._submitError
+            });
+        },
+
+        _submitSuccess: function(data){
+            console.log(data);
+        },
+
+        _submitError: function(){
+            
+        }
+    });
+
+    views.username = Backbone.View.extend({
+        name: 'username',
+        tagName: 'input',
+        id: 'user-create-name',
+
+        events: {
+            'keyup': 'onChange'
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('userName', this.el.value);
+        }
+    });
+
+    views.password = Backbone.View.extend({
+        name: 'password',
+        tagName: 'input',
+        id: 'user-create-password',
+
+        events: {
+            'keyup': 'onChange'
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('userPassword', this.el.value);
+        }
+    });
+
+    return views;
+});
+define('user-create-collections',[],function(){
+    var collections = {};
+
+    return collections;
+});
+define('user-create', ['user-create-models', 'user-create-views', 'user-create-collections'],  function(m, v, c){
+    var userCreate = {
+        models: m,
+        views: v,
+        collections: c
+    };
+
+
+    var formData = new userCreate.models.formData();
+
+    userCreate.viewUserCreate = new userCreate.views.userCreate({
+        model: formData
+    });
+
+    userCreate.viewUserCreate._initializeSubViews = function(){
+        // userCreate.username.el = userCreate.viewUserCreate.el.querySelector('#' + userCreate.username.id);
+        // userCreate.password.el = userCreate.viewUserCreate.el.querySelector('#' + userCreate.password.id);
+
+        userCreate.username = new userCreate.views.username({
+            model: formData,
+            el: userCreate.viewUserCreate.el.querySelector('#user-create-username')
+        });
+
+        userCreate.password = new userCreate.views.password({
+            model: formData,
+            el: userCreate.viewUserCreate.el.querySelector('#user-create-password')
+        });
+
+    };
+
+
+    return userCreate;
+});
+define('index-models',[],function(){
+    var models = {};
+
+    return models;
 });
 define('index-views',['base-view'], function(BaseView){
 
@@ -14182,7 +14512,6 @@ define('event-create-views',['base-view', 'nunjucks'], function(BaseView, nunjuc
         // template: nunjucks.render('create-event.html'),
 
         initialize: function(){
-            console.log('event create');
         },
 
         render: function(){
@@ -14208,6 +14537,9 @@ define('event-create', ['event-create-models', 'event-create-views', 'event-crea
         collections: c
     };
 
+
+    eventCreate.viewEventCreate = new eventCreate.views.eventCreate();
+
     return eventCreate;
 });
 /*jshint sub:true*/
@@ -14222,14 +14554,18 @@ define('app',
         'router',
         'dispatcher',
         'root',
+        'user-login',
+        'user-create',
         'index',
         'event-create'
     ],
-    function($, _, Backbone, nunjucks, templates, router, dispatcher, root, index, eventCreate){
+    function($, _, Backbone, nunjucks, templates, router, dispatcher, root, userLogin, userCreate, index, eventCreate){
 
         return {
             nunjucks: nunjucks,
             root: root,
+            userLogin: userLogin,
+            userCreate: userCreate,
             index: index,
             eventCreate: eventCreate,
         	router: router
@@ -14241,15 +14577,62 @@ require(['app'], function(app){
 
     window.app = app;
 
+    // TODO: Might be worth building a list of all subview initially
     app.subViews = {};
+
+
+    // TODO: Seperate into a seperate document if this gets too full
+    app.utils = {};
+
+    app.utils.returnSelectedView = function(view){
+        var source = $.camelCase(view.replace('view-', '')),
+            selectedView = $.camelCase(view);
+
+        return app[source][selectedView];
+    };
+
+    var Session = Backbone.Model.extend({
+        defaults: {
+            token: null, //unique session token
+            userId: null, //username
+            userSecret: null //hashed password
+        },
+        initialize: function(){
+            if(!!document.cookie){
+                var cookie = this._cookieStringToObject(document.cookie);
+            }else{
+                console.log('User not logged in');
+            }
+        },
+        _cookieStringToObject: function(string){
+            var split = string.split(';'),
+                splat = {};
+
+            _.each(split, function(element, index){
+                splat[element.split('=')[0]] = element.split('=')[1];
+                
+            });
+
+            return splat;
+        }
+    });
+
+    var session = new Session();
 
     app.subViews['root'] = new app.root.views.Root({
         model: new app.root.models.viewManager()
     });
-    app.subViews['view-index'] = new app.index.views.Index();
-    app.subViews['view-event-create'] = new app.eventCreate.views.eventCreate();
+    // app.subViews['view-login'] = new app.login.views.Login({
+    //     model: new app.login.models.formData()
+    // });
+    // app.subViews['view-index'] = new app.index.views.Index();
+    // app.subViews['view-event-create'] = new app.eventCreate.views.eventCreate();
+    var initialViewElement = document.querySelector('section'),
+        initalViewId = initialViewElement.getAttribute('id'),
+        initialView = app.utils.returnSelectedView(initalViewId);
 
-    var initialView = document.querySelector('section').getAttribute('id');
-    app.subViews['root']._setSubView(app.subViews[initialView]);
+    initialView.el = initialViewElement;
+
+    app.subViews['root']._setSubView(initialView);
 
 });

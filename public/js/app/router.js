@@ -8,8 +8,8 @@ define('router', ['backbone', 'dispatcher'],  function(Backbone, dispatcher){
 		routes: {
 			'create-event': 'view-event-create',
 			'create-user': 'view-user-create',
-			'': 'view-user-login',
-			// '': 'view-index'
+			'login': 'view-user-login',
+			'': 'view-index'
 		}
 	});
 

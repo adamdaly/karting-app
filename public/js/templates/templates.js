@@ -39,7 +39,7 @@ var lineno = null;
 var colno = null;
 var output = "";
 try {
-output += "<section id=\"view-user-login\">\n\t<form action=\"/login\" method=\"POST\">\n\t\t<div>\n\t\t\t<label for=\"name\">Username</label>\n\t\t\t<input type=\"text\" name=\"user-name\" id=\"user-name\">\n\t\t</div>\n\t\t<div>\n\t\t\t<label for=\"number\">Password</label>\n\t\t\t<input type=\"text\" name=\"user-password\" id=\"user-password\">\n\t\t</div>\t\n\t\t<div>\n\t\t\t<input type=\"submit\">\n\t\t</div>\n\t</form>\n</section>";
+output += "<section id=\"view-user-login\">\n\t<form action=\"/login\" method=\"POST\">\n\t\t<div>\n\t\t\t<label for=\"name\">Username</label>\n\t\t\t<input type=\"text\" name=\"user-name\" id=\"user-create-username\">\n\t\t</div>\n\t\t<div>\n\t\t\t<label for=\"number\">Password</label>\n\t\t\t<input type=\"text\" name=\"user-password\" id=\"user-create-password\">\n\t\t</div>\t\n\t\t<div>\n\t\t\t<input type=\"submit\">\n\t\t</div>\n\t</form>\n</section>";
 cb(null, output);
 ;
 } catch (e) {

@@ -1,4 +1,4 @@
-define(['base-view'], function(BaseView){
+define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
 
     var views = {};
 
@@ -12,6 +12,14 @@ define(['base-view'], function(BaseView){
         },
 
         initialize: function(){
+        },
+
+        render: function(){
+            var template = nunjucks.render('view-index.html', {});
+            
+            this.setElement(template);
+
+            return this;
         },
 
         navToSubView: function(e){

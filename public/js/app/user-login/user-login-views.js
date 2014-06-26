@@ -16,7 +16,7 @@ define(['base-view', 'nunjucks', 'dispatcher'], function(BaseView, nunjucks, dis
         // template: nunjucks.render('create-event.html'),
 
         initialize: function(){
-            console.log('login');
+            
             this.listenTo(this.model, 'change', this._update);
         },
 
@@ -33,21 +33,27 @@ define(['base-view', 'nunjucks', 'dispatcher'], function(BaseView, nunjucks, dis
             var self = this;
 
             $.ajax({
-                url: '/',
+                url: '/login',
                 method: 'POST',
                 dataType: 'JSON',
-                data: this.model.toJSON(),
+                data: self.model.toJSON(),
                 success: self._submitSuccess,
                 error: self._submitError
             });
         },
 
-        _submitSuccess: function(){
+        _submitSuccess: function(res){
+            console.log(res);
+
+            if(!!res.hasOwnProperty('success')){
+                router.navigate('/', { trigger: true });
+
+            }
             
         },
 
-        _submitError: function(){
-            
+        _submitError: function(error){
+            console.log(error);
         },
 
         onUserCreate: function(e){
@@ -65,7 +71,8 @@ define(['base-view', 'nunjucks', 'dispatcher'], function(BaseView, nunjucks, dis
         id: 'user-name',
 
         events: {
-            'keyup': 'onChange'
+            'keyup': 'onChange',
+            'select': 'onChange'// Because of autofill
         },
 
         initialize: function(){
@@ -73,7 +80,27 @@ define(['base-view', 'nunjucks', 'dispatcher'], function(BaseView, nunjucks, dis
         },
 
         onChange: function(){
-            this.model.set('userName', this.el.value);
+            this.model.set('user-name', this.el.value);
+        }
+    });
+
+    views.password = Backbone.View.extend({
+        name: 'password',
+
+        el: '#user-password',
+        id: 'user-password',
+
+        events: {
+            'keyup': 'onChange',
+            'select': 'onChange'// Because of autofill
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('user-password', this.el.value);
         }
     });
 

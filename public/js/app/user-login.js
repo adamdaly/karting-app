@@ -16,5 +16,9 @@ define('user-login', ['user-login-models', 'user-login-views', 'user-login-colle
         model: formData
     });
 
+    userLogin.password = new userLogin.views.password({
+        model: formData
+    });
+
     return userLogin;
 });

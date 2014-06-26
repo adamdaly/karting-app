@@ -11,7 +11,6 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
         // template: nunjucks.render('create-event.html'),
 
         initialize: function(){
-            console.log('event create');
         },
 
         render: function(){

@@ -5,5 +5,6 @@ define('index', ['index-models', 'index-views', 'index-collections'],  function(
         collections: c
     };
 
+    index.viewIndex = new index.views.Index();
     return index;
 });

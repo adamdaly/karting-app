@@ -5,8 +5,9 @@ define('base-view', ['nunjucks'], function(nunjucks){
 		render: function(){
 			return this;
 		},
-		add: function(){},
-		remove: function(){
+        _initializeSubViews: function(){},
+		_add: function(){},
+		_remove: function(){
 			this.el.remove();
 		}
 	});

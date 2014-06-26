@@ -5,7 +5,6 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
     views.userCreate = BaseView.extend({
         name: 'user-create',
 
-        el: '#view-user-create',
         id: 'view-user-create',
 
         events: {
@@ -15,7 +14,7 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
         // template: nunjucks.render('create-event.html'),
 
         initialize: function(){
-            console.log('user-create');
+            
             this.listenTo(this.model, 'change', this._update);
         },
 
@@ -23,6 +22,9 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
             var template = nunjucks.render('view-user-create.html', {});
             
             this.setElement(template);
+
+            //doesn't exist yet?
+            this._initializeSubViews();
 
             return this;
         },
@@ -32,7 +34,7 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
             var self = this;
 
             $.ajax({
-                url: '/',
+                url: '/create-user',
                 method: 'POST',
                 dataType: 'JSON',
                 data: this.model.toJSON(),
@@ -41,8 +43,8 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
             });
         },
 
-        _submitSuccess: function(){
-            
+        _submitSuccess: function(data){
+            console.log(data);
         },
 
         _submitError: function(){
@@ -52,9 +54,8 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
 
     views.username = Backbone.View.extend({
         name: 'username',
-
-        el: '#user-name',
-        id: 'user-name',
+        tagName: 'input',
+        id: 'user-create-name',
 
         events: {
             'keyup': 'onChange'
@@ -66,6 +67,24 @@ define(['base-view', 'nunjucks'], function(BaseView, nunjucks){
 
         onChange: function(){
             this.model.set('userName', this.el.value);
+        }
+    });
+
+    views.password = Backbone.View.extend({
+        name: 'password',
+        tagName: 'input',
+        id: 'user-create-password',
+
+        events: {
+            'keyup': 'onChange'
+        },
+
+        initialize: function(){
+
+        },
+
+        onChange: function(){
+            this.model.set('userPassword', this.el.value);
         }
     });
 

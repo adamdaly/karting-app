@@ -25,12 +25,12 @@
             
             script.src = 'js/libs/requirejs/require.js';
 
-            if(document.location.search.match(/debug/gi)){
+            // if(document.location.search.match(/debug/gi)){
                 script.setAttribute('data-main', 'js/config');
 
-            }else{
-                script.setAttribute('data-main', 'js/build/app');
-            }
+            // }else{
+            //     script.setAttribute('data-main', 'js/build/app');
+            // }
             
             body.appendChild(script);
 

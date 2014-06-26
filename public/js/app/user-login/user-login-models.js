@@ -3,11 +3,10 @@ define(function(){
 
     models.formData = Backbone.Model.extend({
     	defaults: {
-    		userName: '',
-    		userPassword: '',
-    		userRemember: false
+    		'user-name': '',
+    		'user-password': '',
+    		'user-remember': false
     	},
-    	url: '/login',
     	initialise: function(){
     	}
     });

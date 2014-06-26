@@ -37,6 +37,7 @@ require(['app'], function(app){
     app.subViews = {};
 
 
+    // TODO: Seperate into a seperate document if this gets too full
     app.utils = {};
 
     app.utils.returnSelectedView = function(view){
@@ -46,6 +47,34 @@ require(['app'], function(app){
         return app[source][selectedView];
     };
 
+    var Session = Backbone.Model.extend({
+        defaults: {
+            token: null, //unique session token
+            userId: null, //username
+            userSecret: null //hashed password
+        },
+        initialize: function(){
+            if(!!document.cookie){
+                var cookie = this._cookieStringToObject(document.cookie);
+            }else{
+                console.log('User not logged in');
+            }
+        },
+        _cookieStringToObject: function(string){
+            var split = string.split(';'),
+                splat = {};
+
+            _.each(split, function(element, index){
+                splat[element.split('=')[0]] = element.split('=')[1];
+                
+            });
+
+            return splat;
+        }
+    });
+
+    var session = new Session();
+
     app.subViews['root'] = new app.root.views.Root({
         model: new app.root.models.viewManager()
     });
@@ -54,8 +83,12 @@ require(['app'], function(app){
     // });
     // app.subViews['view-index'] = new app.index.views.Index();
     // app.subViews['view-event-create'] = new app.eventCreate.views.eventCreate();
-    var initalView = document.querySelector('section').getAttribute('id');
+    var initialViewElement = document.querySelector('section'),
+        initalViewId = initialViewElement.getAttribute('id'),
+        initialView = app.utils.returnSelectedView(initalViewId);
 
-    app.subViews['root']._setSubView(app.utils.returnSelectedView(initalView));
+    initialView.el = initialViewElement;
+
+    app.subViews['root']._setSubView(initialView);
 
 });
